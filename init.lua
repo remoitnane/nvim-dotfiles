@@ -149,17 +149,31 @@ else
   --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
   vim.g.mapleader = ' '
   vim.g.maplocalleader = ' '
-  vim.keymap.set('n', '<leader>*', "*''cgn")
-  vim.keymap.set('x', '<leader>e', 'y:%s/<C-r><C-r>"//gc<Left><Left><Left>')
-  vim.keymap.set('n', '<leader>e', 'yiw:%s/<C-r><C-r>"//gc<Left><Left><Left>')
+  vim.keymap.set('n', '<leader>*', "*''cgn", { desc = 'Replace words' })
+  vim.keymap.set('x', '<leader>e', 'y:%s/<C-r><C-r>"//gc<Left><Left><Left>', { desc = 'Replace pattern' })
+  vim.keymap.set('n', '<leader>e', 'yiw:%s/<C-r><C-r>"//gc<Left><Left><Left>', { desc = 'Replace pattern' })
   -- vim.keymap.set('n', '<C-\\>', ':terminal zsh<CR>')
-  vim.keymap.set('n', '<leader>\\', ':terminal zsh<CR>')
-  vim.keymap.set('n', '<leader>S', ':setlocal spell spelllang=en_us<CR>')
-  vim.keymap.set('n', '<leader>ac', ':ChatGPT<CR>')
-  vim.keymap.set('n', '<leader>aa', ':ChatGPTActAs<CR>')
-  vim.keymap.set('n', '<leader>vc', ':CsvViewEnable<CR>')
+  vim.keymap.set('n', '<leader>\\', ':ToggleTerm direction=float<CR>', { desc = 'Terminal in float' })
+  vim.keymap.set('n', '<leader>`', ':ToggleTerm direction=horizontal<CR>', { desc = 'Terminal in horizontal' })
+  vim.keymap.set('n', '<leader>S', ':setlocal spell spelllang=en_us<CR>', { desc = 'Spell check' })
+  vim.keymap.set('n', '<leader>ac', ':ChatGPT<CR>', { desc = 'OpenAI chatGPT Chat' })
+  vim.keymap.set('n', '<leader>aa', ':ChatGPTActAs<CR>', { desc = 'OpenAI chatGPT Act As' })
+  vim.keymap.set('n', '<leader>pc', ':CsvViewEnable<CR>', { desc = 'Preview Csv' })
   -- vim.keymap.set('n', '<leader>CC', ':ChatGPTCompleteCode<CR>')
-  vim.keymap.set('n', '<leader>T', ':GenTocGFM<CR>')
+  vim.keymap.set('n', '<leader>T', ':GenTocGFM<CR>', { desc = 'Generate TOC' })
+
+  -- Map Ctrl+b to Left Arrow in Insert Mode
+  vim.keymap.set('i', '<C-b>', '<Left>', { noremap = true, silent = true })
+
+  -- Map Ctrl+f to Right Arrow in Insert Mode
+  vim.keymap.set('i', '<C-f>', '<Right>', { noremap = true, silent = true })
+
+  -- Map Ctrl+n to Down Arrow in Insert Mode
+  vim.keymap.set('i', '<C-n>', '<Down>', { noremap = true, silent = true })
+
+  -- Map Ctrl+p to Up Arrow in Insert Mode
+  vim.keymap.set('i', '<C-p>', '<Up>', { noremap = true, silent = true })
+
   -- -- Map 'j' to '4j' in normal mode
   -- vim.keymap.set('n', 'j', '4j')
   -- -- Map 'h' to '4h' in normal mode
@@ -168,11 +182,72 @@ else
   -- vim.keymap.set('n', 'k', '4k')
   -- -- Map 'l' to '4l' in normal mode
   -- vim.keymap.set('n', 'l', '4l')
+  -- NOTE Useful macro:
+  vim.keymap.set('n', '<leader>ih', '0i#<Esc>', { desc = 'Insert markdown Header' })
+  vim.keymap.set('n', '<leader>ij', '0i!<Esc>', { desc = 'Insert Jupyter magic for exec code' })
+  vim.keymap.set('n', '<leader>ip', 'i```{python}<CR><CR>```<Esc>', { desc = 'Insert Python code block' })
+  vim.keymap.set('n', '<leader>itp', 'i```{python}<CR>#| tags: [base-a]<CR>```<Esc>', { desc = 'Insert Tagged Python code block' })
+  vim.keymap.set('n', '<leader>ita', '0i#| tags: [base-a]<CR><Esc>', { desc = 'Insert Tagged Additionally' })
+  vim.keymap.set('n', '<leader>is', 'i```{sh}<CR>%%bash<CR>```<Esc>', { desc = 'Insert Shell code block' })
+  vim.keymap.set('n', '<leader>ib', 'i```<CR><CR>```<Esc>', { desc = 'Insert code Block' })
+  vim.keymap.set('n', '<leader>ii', 'a``<Esc>', { desc = 'Insert code block Inline' })
   vim.keymap.set('i', '<C-a>', '<Esc>^i')
   vim.keymap.set('i', '<C-e>', '<Esc>$a')
+  -- Map <leader>rc to read command output after the cursor
+  vim.keymap.set('n', '<leader>rc', function()
+    -- 'a' enters append mode.
+    -- 'feedkeys' simulates typing for us.
+    -- The expression uses input() to ask the user for a command.
+    -- '\<CR>' simulates the final Enter keypress.
+    -- 'i' ensures we stay in insert mode afterwards if we want. Remove it to return to normal mode.
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes("a<Space><Left><C-R>=system(input('Command: '))<CR>", true, false, true),
+      'n',
+      false
+    )
+  end, { noremap = true, silent = true, desc = "Read shell command output after cursor" })
+  vim.keymap.set('n', '<leader>rte', function()
+    -- 'a' enters append mode.
+    -- 'feedkeys' simulates typing for us.
+    -- The expression uses input() to ask the user for a command.
+    -- '\<CR>' simulates the final Enter keypress.
+    -- 'i' ensures we stay in insert mode afterwards if we want. Remove it to return to normal mode.
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes("o<C-R>=system('llm \"Translate the following content to English language: ' .. input('Command: ') .. '\"')<CR>", true, false, true),
+      'n',
+      false
+    )
+  end, { noremap = true, silent = true, desc = "Read shell command output and translate to English" })
+  vim.keymap.set('n', '<leader>rtj', function()
+    -- 'a' enters append mode.
+    -- 'feedkeys' simulates typing for us.
+    -- The expression uses input() to ask the user for a command.
+    -- '\<CR>' simulates the final Enter keypress.
+    -- 'i' ensures we stay in insert mode afterwards if we want. Remove it to return to normal mode.
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes("o<C-R>=system('llm \"Translate the following content to 日本語 language: ' .. input('Command: ') .. '\"')<CR>", true, false, true),
+      'n',
+      false
+    )
+  end, { noremap = true, silent = true, desc = "Read shell command output and translate to Japanese" })
+  vim.keymap.set('n', '<leader>rsqt', function()
+    -- 'a' enters append mode.
+    -- 'feedkeys' simulates typing for us.
+    -- The expression uses input() to ask the user for a command.
+    -- '\<CR>' simulates the final Enter keypress.
+    -- 'i' ensures we stay in insert mode afterwards if we want. Remove it to return to normal mode.
+    vim.api.nvim_feedkeys(
+      vim.api.nvim_replace_termcodes("o<C-R>=system('llm \" Please suggest some tags with capitalize the first letter of every word and use hyphens instead of spaces in each tag as a list without explanation which would be relevant to: ' .. input('Command: ') .. '\"')<CR>", true, false, true),
+      'n',
+      false
+    )
+  end, { noremap = true, silent = true, desc = "Read shell command output and suggest some tags" })
+  -- system(string.format('llm "Translate the following content to English language: %s"', input('Command: ')))
+
   -- Add another escape key.
-  vim.keymap.set('i', 'zq', '<Esc>', { noremap = true, silent = true })
+  vim.keymap.set('i', 'jj', '<Esc>', { noremap = true, silent = true })
   vim.o.timeoutlen = 100 -- Set timeout length to 100ms (adjust as needed)
+
 
   -- Map <leader>cc to print the full path of the current file
   vim.keymap.set('n', '<leader>cc', function()
@@ -266,7 +341,7 @@ else
 
   -- [[ Basic Keymaps ]]
   -- My Own Keymaps
-  vim.keymap.set('n', '<leader>p', '<cmd>:e ~/Media/Library/ethos.md<cr>')
+  -- vim.keymap.set('n', '<leader>p', '<cmd>:e ~/Media/Library/ethos.md<cr>')
   --  See `:help vim.keymap.set()`
 
   -- Clear highlights on search when pressing <Esc> in normal mode
@@ -312,6 +387,34 @@ else
       vim.highlight.on_yank()
     end,
   })
+
+  -- NOTE My Own Function
+  local function backup_current_buffer()
+    -- Get the current buffer content
+    local buf_content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+
+    -- Use mktemp to create a temporary file
+    local handle = io.popen('mktemp')
+    local temp_file = handle:read("*a"):gsub("%s+", "") -- Remove any newline or space
+    handle:close()
+
+    -- Write the buffer content to the temporary file
+    local file = io.open(temp_file, "w")
+    if file then
+        for _, line in ipairs(buf_content) do
+            file:write(line .. "\n")
+        end
+        file:close()
+        print("Backup saved to: " .. temp_file)
+    else
+        print("Failed to create temporary file.")
+    end
+  end
+
+  -- You can create a Vim command to call this function
+  vim.api.nvim_create_user_command('BackupCurrentBuffer', backup_current_buffer, {})
+  vim.keymap.set('n', '<leader>b', ':BackupCurrentBuffer<CR>')
+  vim.keymap.set('n', '<leader>B', ':w<CR>:BackupCurrentBuffer<CR>', { desc = 'Save and Backup' })
 
   -- NOTE: My Own Highlight Settings.
   vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
@@ -370,11 +473,29 @@ else
             -- ["Find Subword Under"] = "<C-k>",
             -- ["Add Cursor Down"] = '<C-e>', -- Conflict occured, use custom.plugins.multiple-cursors intead.
             -- ["Add Cursor Up"] = '<C-a>', -- Conflict occured, use custom.plugins.multiple-cursors intead.
-            ["Visual Add"] = "mi"
+            ["Visual Add"] = "ma"
         }
       end
     },
     {"mzlogin/vim-markdown-toc"},
+    {
+      'kiddos/gemini.nvim',
+      opts={
+        model_config = {
+          -- model_id = vim.api.MODELS.GEMINI_2_5_FLASH,
+        },
+        hints = {
+          insert_result_key = '<C-q>',
+        },
+        completion = {
+          completion_delay = 700,
+          insert_result_key = '<C-q>',
+        },
+        instruction = {
+          menu_key = '<C-z>'
+        },
+      }
+    },
     {'godlygeek/tabular'},
     {'preservim/vim-markdown',
       config = function()
@@ -437,46 +558,14 @@ else
       version = "*",
       config = function()
         require("toggleterm").setup{
-          open_mapping = [[<c-\>]],
+          -- open_mapping = [[<leader>\]],
+          float_opts = {
+            border = "curved",
+          },
         }
       end,
       -- config = true,
       -- opts = {--[[ things you want to change go here]]},
-    },
-    {
-      'gbprod/yanky.nvim',
-      dependencies = {
-        { 'kkharji/sqlite.lua' },
-      },
-      opts = {
-        ring = { storage = 'sqlite' },
-      },
-      keys = {
-        {
-          '<leader>p',
-          function()
-            require('telescope').extensions.yank_history.yank_history {}
-          end,
-          desc = 'Open Yank History',
-        },
-        { 'y', '<Plug>(YankyYank)', mode = { 'n', 'x' }, desc = 'Yank text' },
-        { 'p', '<Plug>(YankyPutAfter)', mode = { 'n', 'x' }, desc = 'Put yanked text after cursor' },
-        { 'P', '<Plug>(YankyPutBefore)', mode = { 'n', 'x' }, desc = 'Put yanked text before cursor' },
-        { 'gp', '<Plug>(YankyGPutAfter)', mode = { 'n', 'x' }, desc = 'Put yanked text after selection' },
-        { 'gP', '<Plug>(YankyGPutBefore)', mode = { 'n', 'x' }, desc = 'Put yanked text before selection' },
-        { '<c-p>', '<Plug>(YankyPreviousEntry)', desc = 'Select previous entry through yank history' },
-        { '<c-n>', '<Plug>(YankyNextEntry)', desc = 'Select next entry through yank history' },
-        { ']p', '<Plug>(YankyPutIndentAfterLinewise)', desc = 'Put indented after cursor (linewise)' },
-        { '[p', '<Plug>(YankyPutIndentBeforeLinewise)', desc = 'Put indented before cursor (linewise)' },
-        { ']P', '<Plug>(YankyPutIndentAfterLinewise)', desc = 'Put indented after cursor (linewise)' },
-        { '[P', '<Plug>(YankyPutIndentBeforeLinewise)', desc = 'Put indented before cursor (linewise)' },
-        { '>p', '<Plug>(YankyPutIndentAfterShiftRight)', desc = 'Put and indent right' },
-        { '<p', '<Plug>(YankyPutIndentAfterShiftLeft)', desc = 'Put and indent left' },
-        { '>P', '<Plug>(YankyPutIndentBeforeShiftRight)', desc = 'Put before and indent right' },
-        { '<P', '<Plug>(YankyPutIndentBeforeShiftLeft)', desc = 'Put before and indent left' },
-        { '=p', '<Plug>(YankyPutAfterFilter)', desc = 'Put after applying a filter' },
-        { '=P', '<Plug>(YankyPutBeforeFilter)', desc = 'Put before applying a filter' },
-      },
     },
 
     -- NOTE: kickstart default plugins.
@@ -906,6 +995,7 @@ else
           'black',
           'isort',
           'prettier',
+          'shfmt',
         })
         require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -967,6 +1057,8 @@ else
           -- You can use 'stop_after_first' to run the first available formatter from the list
           javascript = { 'prettier' },
           -- javascript = { "prettierd", "prettier", stop_after_first = true },
+          zsh = { 'shfmt' },
+          bash = { 'shfmt' },
         },
       },
     },
@@ -1225,8 +1317,8 @@ else
     require 'kickstart.plugins.lint',
     require 'kickstart.plugins.autopairs',
     require 'kickstart.plugins.neo-tree',
+    require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
     -- require 'custom.plugins.toggleterm-config',
-    -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
     -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
     --    This is the easiest way to modularize your config.
@@ -1242,6 +1334,9 @@ else
     { import = 'custom.plugins.quarto' },
     { import = 'custom.plugins.csvview' },
     { import = 'custom.plugins.multiple-cursors' },
+    { import = 'custom.plugins.satellite' },
+    -- { import = 'custom.plugins.hardtime' },
+    -- { import = 'custom.plugins.yanky' },
   }, {
     ui = {
       -- If you are using a Nerd Font: set icons to an empty table which will use the

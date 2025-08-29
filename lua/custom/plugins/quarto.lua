@@ -13,24 +13,24 @@ return {
     },
   },
 
-  { -- directly open ipynb files as quarto docuements
-    -- and convert back behind the scenes
-    'GCBallesteros/jupytext.nvim',
-    opts = {
-      custom_language_formatting = {
-        python = {
-          extension = 'qmd',
-          style = 'quarto',
-          force_ft = 'quarto',
-        },
-        r = {
-          extension = 'qmd',
-          style = 'quarto',
-          force_ft = 'quarto',
-        },
-      },
-    },
-  },
+  -- { -- directly open ipynb files as quarto docuements
+  --   -- and convert back behind the scenes
+  --   'GCBallesteros/jupytext.nvim',
+  --   opts = {
+  --     custom_language_formatting = {
+  --       python = {
+  --         extension = 'qmd',
+  --         style = 'quarto',
+  --         force_ft = 'quarto',
+  --       },
+  --       r = {
+  --         extension = 'qmd',
+  --         style = 'quarto',
+  --         force_ft = 'quarto',
+  --       },
+  --     },
+  --   },
+  -- },
 
   { -- send code from python/r/qmd documets to a terminal or REPL
     -- like ipython, R, bash
@@ -81,37 +81,37 @@ return {
     end,
   },
 
-  { -- paste an image from the clipboard or drag-and-drop
-    'HakonHarnes/img-clip.nvim',
-    event = 'BufEnter',
-    ft = { 'markdown', 'quarto', 'latex' },
-    opts = {
-      default = {
-        dir_path = 'img',
-      },
-      filetypes = {
-        markdown = {
-          url_encode_path = true,
-          template = '![$CURSOR]($FILE_PATH)',
-          drag_and_drop = {
-            download_images = false,
-          },
-        },
-        quarto = {
-          url_encode_path = true,
-          template = '![$CURSOR]($FILE_PATH)',
-          drag_and_drop = {
-            download_images = false,
-          },
-        },
-      },
-    },
-    config = function(_, opts)
-      require('img-clip').setup(opts)
-      vim.keymap.set('n', '<leader>ii', ':PasteImage<cr>', { desc = 'insert [i]mage from clipboard' })
-    end,
-  },
-
+  -- { -- paste an image from the clipboard or drag-and-drop
+  --   'HakonHarnes/img-clip.nvim',
+  --   event = 'BufEnter',
+  --   ft = { 'markdown', 'quarto', 'latex' },
+  --   opts = {
+  --     default = {
+  --       dir_path = 'img',
+  --     },
+  --     filetypes = {
+  --       markdown = {
+  --         url_encode_path = true,
+  --         template = '![$CURSOR]($FILE_PATH)',
+  --         drag_and_drop = {
+  --           download_images = false,
+  --         },
+  --       },
+  --       quarto = {
+  --         url_encode_path = true,
+  --         template = '![$CURSOR]($FILE_PATH)',
+  --         drag_and_drop = {
+  --           download_images = false,
+  --         },
+  --       },
+  --     },
+  --   },
+  --   config = function(_, opts)
+  --     require('img-clip').setup(opts)
+  --     vim.keymap.set('n', '<leader>ii', ':PasteImage<cr>', { desc = 'insert [i]mage from clipboard' })
+  --   end,
+  -- },
+  --
   { -- preview equations
     'jbyuki/nabla.nvim',
     keys = {
@@ -123,13 +123,35 @@ return {
     -- see the image.nvim readme for more information about configuring this plugin
     '3rd/image.nvim',
     opts = {
-      backend = 'kitty', -- whatever backend you would like to use
+      backend = "kitty", -- whatever backend you would like to use
+      integrations = {
+        markdown = {
+          enabled = true,
+          clear_in_insert_mode = false,
+          download_remote_images = true,
+          only_render_image_at_cursor = false,
+          filetypes = { "markdown", "vimwiki", "quarto" }, -- markdown extensions (ie. quarto) can go here
+        },
+        neorg = {
+          enabled = true,
+          clear_in_insert_mode = false,
+          download_remote_images = true,
+          only_render_image_at_cursor = false,
+          filetypes = { "norg" },
+        },
+      },
+      -- max_width = nil,
+      -- max_height = nil,
       max_width = 100,
       max_height = 12,
+      -- max_width_window_percentage = nil,
+      -- max_height_window_percentage = 50,
       max_height_window_percentage = math.huge,
       max_width_window_percentage = math.huge,
+
       window_overlap_clear_enabled = true, -- toggles images when windows are overlapped
       window_overlap_clear_ft_ignore = { 'cmp_menu', 'cmp_docs', '' },
+      kitty_method = "normal",
     },
   },
   {
@@ -147,7 +169,7 @@ return {
       { '<leader>mi', ':MoltenInit ', desc = '[m]olten [i]nit' },
       { '<leader>ms', ':MoltenSave ', desc = '[m]olten [s]ave output to path' },
       {
-        '<leader>mv',
+        '<leader>v',
         ':<C-u>MoltenEvaluateVisual<cr>',
         mode = 'v',
         desc = 'molten eval visual',
