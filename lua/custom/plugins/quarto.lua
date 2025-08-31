@@ -122,6 +122,10 @@ return {
   {
     -- see the image.nvim readme for more information about configuring this plugin
     '3rd/image.nvim',
+    cond = function()
+      -- Only load image.nvim if not running in headless mode
+      return #vim.api.nvim_list_uis() > 0
+    end,
     opts = {
       backend = "kitty", -- whatever backend you would like to use
       integrations = {
